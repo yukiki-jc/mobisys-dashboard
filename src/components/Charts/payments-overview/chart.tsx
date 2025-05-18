@@ -7,7 +7,6 @@ import dynamic from "next/dynamic";
 type PropsType = {
   data: {
     received: { x: unknown; y: number }[];
-    due: { x: unknown; y: number }[];
   };
 };
 
@@ -93,11 +92,7 @@ export function PaymentsOverviewChart({ data }: PropsType) {
           {
             name: "Received",
             data: data.received,
-          },
-          {
-            name: "Due",
-            data: data.due,
-          },
+          }
         ]}
         type="area"
         height={310}

@@ -94,6 +94,47 @@ export async function getPaymentsOverviewData(
   };
 }
 
+export function getDeafultDynamicThroughputData(
+  testData: number,
+) {
+  // CREATE A ALL ZERO DEFAULT DAT 
+  return {
+    received: [
+      { x: -9, y: 0 },
+      { x: -8, y: 0 },
+      { x: -7, y: 0 },
+      { x: -6, y: 0 },
+      { x: -5, y: 0 },
+      { x: -4, y: 0 },
+      { x: -3, y: 0 },
+      { x: -2, y: 0 },
+      { x: -1, y: 0 },
+      { x: 0, y: 0 },
+    ]
+  };
+}
+export async function getDynamicThroughputData(
+  testData: number,
+) {
+  // Fake delay
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+
+  return {
+    received: [
+      { x: -9, y: 20 + testData },
+      { x: -8, y: 35 + testData },
+      { x: -7, y: 45 + testData },
+      { x: -6, y: 35 + testData },
+      { x: -5, y: 55 + testData },
+      { x: -4, y: 65 + testData },
+      { x: -3, y: 50 + testData },
+      { x: -2, y: 65 + testData },
+      { x: -1, y: 75 + testData },
+      { x: 0, y: 85 + testData },
+    ]
+  };
+}
+
 export async function getWeeksProfitData(timeFrame?: string) {
   // Fake delay
   await new Promise((resolve) => setTimeout(resolve, 1000));
