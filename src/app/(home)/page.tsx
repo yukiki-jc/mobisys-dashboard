@@ -16,9 +16,9 @@ export default async function Home({ searchParams }: PropsType) {
 
   return (
     <>
-      <Suspense fallback={<OverviewCardsSkeleton />}>
+      {/* <Suspense fallback={<OverviewCardsSkeleton />}>
         <OverviewCardsGroup />
-      </Suspense>
+      </Suspense> */}
 
       <DashboardContent timeFrame={extractTimeFrame("payments_overview")?.split(":")[1]} />
     </>

@@ -32,17 +32,25 @@ function LatencyIcon() {
 
 type PropsType = {
   className?: string;
-  onSettingsChange?: (settings: {
+  onSettingsChange: (settings: {
     bandwidth: number;
     accuracy: number;
     latency: number;
   }) => void;
-  isRunning?: boolean;
-  setIsRunning?: (isRunning: boolean) => void;
+  isRunning: boolean;
+  isStartEnabled: boolean;
+  setIsStartEnabled: (v: boolean) => void;
+  onStart: () => void;
+  onStop: () => void; // 添加可选的停止处理函数
 };
 
-export function SplitSettingForm({ className, onSettingsChange, isRunning, setIsRunning }: PropsType) {
-  const [isStartEnabled, setIsStartEnabled] = useState(false);
+export function SplitSettingForm({ className, onSettingsChange, isRunning, isStartEnabled, setIsStartEnabled, onStart, onStop }: PropsType) {
+  // const [isStartEnabled, setIsStartEnabled] = useState(false);
+
+  // 只要有输入变动就禁用 start
+  const handleAnyInputChange = () => {
+    setIsStartEnabled(false);
+  };
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -55,23 +63,20 @@ export function SplitSettingForm({ className, onSettingsChange, isRunning, setIs
     };
 
     onSettingsChange?.(settings);
-    setIsStartEnabled(true);
-    setIsRunning?.(false); // 重置运行状态
+    
   };
 
   const handleStart = () => {
     if (isStartEnabled && !isRunning) {
       console.log('Starting...');
-      setIsRunning?.(true);
-      // TODO: 添加开始处理逻辑
+      onStart();
     }
   };
 
   const handleStop = () => {
     if (isRunning) {
       console.log('Stopping...');
-      setIsRunning?.(false);
-      setIsStartEnabled(false); // 停止后禁用两个按钮
+      onStop();// 停止后禁用两个按钮
       // TODO: 添加停止处理逻辑
     }
   };
@@ -90,54 +95,57 @@ export function SplitSettingForm({ className, onSettingsChange, isRunning, setIs
 
         </div>
       <form onSubmit={handleSubmit}>
-        <div className="mb-5.5 flex flex-col gap-5.5">
+        <div className="mb-5.5 flex flex-row gap-5.5">
           <InputGroup
-            className="w-full"
+            className="w-1/3"
             type="number"
             name="bandwidth"
             label="Bandwidth (MB/s)"
             placeholder="3"
             defaultValue="3"
-            min="0"
-            max="10"
-            step="1"
+            min="0.5"
+            max="3"
+            step="0.5"
             icon={<BandwidthIcon />}
             iconPosition="left"
             height="sm"
+            handleChange={handleAnyInputChange}
           />
 
           <InputGroup
-            className="w-full"
+            className="w-1/3"
             type="number"
             name="accuracy"
             label="Accuracy Loss Limit"
             placeholder="0.04"
             defaultValue="0.04"
-            min="0"
+            min="0.02"
             max="0.1"
             step="0.02"
             icon={<AccuracyIcon />}
             iconPosition="left"
             height="sm"
+            handleChange={handleAnyInputChange}
           />
           
           <InputGroup
-            className="w-full"
+            className="w-1/3"
             type="number"
             name="latency"
             label="Latency Deadline (compared to dev-only)"
             placeholder="0.9"
             defaultValue="0.9"
-            min="0"
-            max="1"
+            min="0.6"
+            max="0.9"
             step="0.1"
             icon={<LatencyIcon />}
             iconPosition="left"
             height="sm"
+            handleChange={handleAnyInputChange}
           />
         </div>
 
-        <div className="flex justify-center gap-3">
+        <div className="flex justify-center gap-3 mb-7.5">
           {/* <button
             className="rounded-lg border border-stroke px-6 py-[7px] font-medium text-dark hover:shadow-1 dark:border-dark-3 dark:text-white"
             type="button"

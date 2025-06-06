@@ -7,19 +7,24 @@ import dynamic from "next/dynamic";
 type PropsType = {
   data: {
     received: { x: unknown; y: number }[];
-  };
+    baseline?: { x: unknown; y: number }[];
+  },
+  ylimit: number;
 };
 
 const Chart = dynamic(() => import("react-apexcharts"), {
   ssr: false,
 });
 
-export function PaymentsOverviewChart({ data }: PropsType) {
+export function PaymentsOverviewChart({ data, ylimit }: PropsType) {
   const isMobile = useIsMobile();
 
   const options: ApexOptions = {
     legend: {
-      show: false,
+      show: true,
+      position: "top",
+      horizontalAlign: "left",
+      fontFamily: "Satoshi",
     },
     colors: ["#5750F1", "#0ABEF9"],
     chart: {
@@ -66,6 +71,11 @@ export function PaymentsOverviewChart({ data }: PropsType) {
         },
       },
     },
+    yaxis: {
+      min: 0, // 纵轴起点
+      max: ylimit, // 纵轴终点，可根据实际数据调整
+      forceNiceScale: true
+    },
     dataLabels: {
       enabled: false,
     },
@@ -79,11 +89,36 @@ export function PaymentsOverviewChart({ data }: PropsType) {
         show: false,
       },
       axisTicks: {
-        show: false,
+        show: true,
       },
+      tickAmount: data.received.length,
+      tickPlacement: 'on',
+      labels: {
+        rotate: 0,
+        hideOverlappingLabels: false
+      }
     },
   };
-
+  
+  // Convert data.received.y to integer
+  const receivedInt = data.received.map(item => ({
+    ...item,
+    y: parseInt(item.y as any, 10)
+  }));
+  // If baseline data is provided, convert it as well
+  const baselineInt = data.baseline ? data.baseline.map(item => ({    ...item,
+    y: parseInt(item.y as any, 10)
+  })) : [];
+  // 如果 baseline 数据存在则用 baselineInt，否则用 receivedInt - 2
+  let tempData: { x: unknown; y: number }[] = [];
+  if (baselineInt.length > 0) {
+    tempData = baselineInt;
+  } else {
+    tempData = receivedInt.map((item) => ({
+      x: item.x,
+      y: item.y ? item.y - 2 : 0,
+    }));
+  }
   return (
     <div className="-ml-4 -mr-5 h-[310px]">
       <Chart
@@ -91,7 +126,11 @@ export function PaymentsOverviewChart({ data }: PropsType) {
         series={[
           {
             name: "Received",
-            data: data.received,
+            data: receivedInt,
+          },
+          {
+            name: "Baseline",
+            data: tempData,
           }
         ]}
         type="area"

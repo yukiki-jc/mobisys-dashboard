@@ -9,6 +9,7 @@ type InputGroupProps = {
   fileStyleVariant?: "style1" | "style2";
   required?: boolean;
   disabled?: boolean;
+  readOnly?: boolean;
   active?: boolean;
   handleChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   value?: string;
@@ -35,15 +36,32 @@ const InputGroup: React.FC<InputGroupProps> = ({
   min,
   max,
   step,
+  readOnly,
   ...props
 }) => {
   const id = useId();
+
+  // 阻止除方向键、Tab、功能键等以外的键盘输入
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    
+    const allowedKeys = [
+      'Tab', 'Shift', 'Control', 'Alt', 'Meta', 'Escape', 'Enter',
+      'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
+      'Home', 'End', 'PageUp', 'PageDown',
+      'Backspace', 'Delete',
+      ...Array.from({length: 12}, (_, i) => `F${i+1}`)
+    ];
+    if (!allowedKeys.includes(e.key)) {
+      e.preventDefault();
+    }
+    
+  };
 
   return (
     <div className={className}>
       <label
         htmlFor={id}
-        className="text-body-sm font-medium text-dark dark:text-white"
+        className="text-body-md font-medium text-dark dark:text-white"
       >
         {label}
         {required && <span className="ml-1 select-none text-red">*</span>}
@@ -79,6 +97,8 @@ const InputGroup: React.FC<InputGroupProps> = ({
           required={required}
           disabled={disabled}
           data-active={active}
+          readOnly={readOnly}
+          onKeyDown={handleKeyDown}
         />
 
         {icon}
