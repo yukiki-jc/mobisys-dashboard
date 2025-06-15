@@ -2,7 +2,7 @@
 
 import { PaymentsOverview } from "@/components/Charts/payments-overview";
 import { SettingsContainer } from "./settings-container";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Toaster } from "react-hot-toast";
 import { fetchAvgThroughputAndLatency, getDynamicLatencyData, getDynamicThroughputData } from "@/services/inference.services";
 import type { ChartData } from "@/types/charts";
@@ -11,7 +11,7 @@ import { SplitResultTable } from "./split-result-table";
 import { exampleTraceRecord } from "./trace-reader";
 
 // 用于每次 fetchData 时弹出 exampleTraceRecord 的下一个元素
-let exampleTraceQueue = [...exampleTraceRecord];
+// let exampleTraceQueue = [...exampleTraceRecord];
 
 type PropsType = {
   timeFrame?: string;
@@ -29,34 +29,16 @@ export function DashboardContent({ timeFrame }: PropsType) {
   const [latencyData, setLatencyData] = useState<ChartData>(getDeafultDynamicThroughputData(0));
   const [baseLatencyData, setBaseLatencyData] = useState<ChartData>(getDeafultDynamicThroughputData(0));
   const [splitResult, setSplitResult] = useState<Array<{ name: string, idx: number }>>([]);
+  const exampleTraceQueue = useRef([...exampleTraceRecord]);
   
-  const fetchData = async (isRunning: boolean, counter: number) => {
-    if (!isRunning) return;
-    const data = await fetchAvgThroughputAndLatency(counter);
-
-    // 每次调用弹出 exampleTraceRecord 的下一个元素
-    let baseData = exampleTraceQueue.length > 0 ? exampleTraceQueue.shift() : null;
-
-    // appendTraceRecord(data);
-    if (data.avg_throughput >= 10 && data.avg_throughput <= 500) {
-      setHistory(prev => [...prev, {throughput: data.avg_throughput, latency: data.avg_latency}]);
-    }
-    
-    if (baseData && baseData.avg_throughput >= 10 && baseData.avg_throughput <= 500) {
-      setBaseHistory(prev => [...prev, {throughput: baseData.avg_throughput, latency: baseData.avg_latency}]);
-    }
-      
-  };
-
-    // 根据 history 更新 throughputData
-  // 通用的移动平均和左移处理函数
-  function updateChartDataFromHistory(historyArr: {throughput: number, latency: number}[],
+  const updateChartDataFromHistory = useCallback((historyArr: {throughput: number, latency: number}[],
     throughputData: ChartData,
     latencyData: ChartData,
-    setThroughputData: (v: ChartData) => void,
-    setLatencyData: (v: ChartData) => void,
-    windowSize = 6
-  ) {
+    setThroughput: (v: ChartData) => void,
+    setLatency: (v: ChartData) => void,
+    windowSize = 6,
+    name = "baseline"
+  ) => {
     if (historyArr.length === 0) return;
     const cur_throughput = [...throughputData.received];
     const cur_latency = [...latencyData.received];
@@ -80,9 +62,39 @@ export function DashboardContent({ timeFrame }: PropsType) {
     // 填充最后一个元素
     cur_throughput[chart_len - 1].y = avg_throughput;
     cur_latency[chart_len - 1].y = avg_latency;
-    setThroughputData({ ...throughputData, received: cur_throughput });
-    setLatencyData({ ...latencyData, received: cur_latency });
+    console.log(`${name} Updating chart data from history: avg_throughput=${avg_throughput}, avg_latency=${avg_latency}`);
+    setThroughput({ ...throughputData, received: cur_throughput });
+    setLatency({ ...latencyData, received: cur_latency });
+  }, []); 
+
+  const fetchData = useCallback(async (isRunning: boolean, counter: number) => {
+    if (!isRunning) return;
+    const data = await fetchAvgThroughputAndLatency(counter);
+    // 每次调用弹出 exampleTraceRecord 的下一个元素
+    let baseData = exampleTraceQueue.current.length > 0 ? exampleTraceQueue.current.shift() : null;
+    // appendTraceRecord(data);
+    if (data.avg_throughput >= 10 && data.avg_throughput <= 500) {
+      setHistory(prev => {
+          console.log("Updating history with data:", data);
+          const next = [...prev, {throughput: data.avg_throughput, latency: data.avg_latency}];
+          return next;
+        }
+      );
+    }
+    
+    if (baseData && baseData.avg_throughput >= 10 && baseData.avg_throughput <= 500) {
+      setBaseHistory(prev => {
+        console.log("Updating base history with data:", baseData);
+        const next = [...prev, {throughput: baseData.avg_throughput, latency: baseData.avg_latency}];
+        return next;
+      }
+      );
   }
+  }, [updateChartDataFromHistory]);
+
+    // 根据 history 更新 throughputData
+  // 通用的移动平均和左移处理函数
+  
 
   useEffect(() => {
     updateChartDataFromHistory(
@@ -91,9 +103,10 @@ export function DashboardContent({ timeFrame }: PropsType) {
       latencyData,
       setThroughputData,
       setLatencyData,
-      6
+      6,
+      "real"
     );
-  }, [history]);
+  }, [history, updateChartDataFromHistory]);
 
   useEffect(() => {
     updateChartDataFromHistory(
@@ -102,11 +115,12 @@ export function DashboardContent({ timeFrame }: PropsType) {
       baseLatencyData,
       setBaseThroughputData,
       setBaseLatencyData,
-      6
+      6,
+      "baseline"
     );
-  }, [baseHistory]);
+  }, [baseHistory, updateChartDataFromHistory]);
 
-  const fetchFakeData = async (isRunning: boolean, k: number) => {
+  const fetchFakeData = useCallback(async (isRunning: boolean, k: number) => {
     
     if (isRunning) {
       // 假设延迟数据与吞吐量数据相关
@@ -130,28 +144,33 @@ export function DashboardContent({ timeFrame }: PropsType) {
       setHistory([])
       setBaseHistory([])
     }
-  };
+  }, []);
+
+  const clearStates = useCallback(() => {
+    setCounter(0);
+    fetchFakeData(false, 0);
+    setHistory([])
+    setBaseHistory([])
+  }, [fetchFakeData]);
 
   useEffect(() => {
     // 初始加载数据
     // fetchData(counter, isRunning ?? false);
     if (!isRunning) {
-      setCounter(0);
-      fetchFakeData(false, 0);
-      setHistory([])
-      setBaseHistory([])
+      clearStates();
       return;
     }
 
     // 设置每秒更新一次，最多持续60秒
     const interval = setInterval(() => {
-      setCounter(prev => {
-        if (!isRunning) {
+      if (!isRunning) {
           fetchFakeData(false, 0);
           setHistory([])
           setBaseHistory([])
           return 0;
-        }
+      }
+      // await fetchData(isRunning, counter);
+      setCounter(prev => {
         if (prev >= 29) {
           // downloadTraceRecord('trace-record.json');
           setIsRunning(false);
@@ -170,7 +189,7 @@ export function DashboardContent({ timeFrame }: PropsType) {
 
     // 清理定时器
     return () => clearInterval(interval);
-  }, [isRunning]);
+  }, [isRunning, fetchData, clearStates, fetchFakeData]);
   
   return (
     <div className="mt-0 grid grid-cols-12 gap-4 md:mt-0 md:gap-4 2xl:mt-0 2xl:gap-4">
