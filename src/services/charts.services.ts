@@ -113,6 +113,16 @@ export function getDeafultDynamicThroughputData(
     ]
   };
 }
+
+export function getDeafultHistoryData(
+  testData: number,
+) {
+  // CREATE A ALL ZERO DEFAULT DAT 
+  return {
+    avg_throughput: 10,
+    avg_latency: 0.03
+  };
+}
 export async function getDynamicThroughputData(
   testData: number,
 ) {

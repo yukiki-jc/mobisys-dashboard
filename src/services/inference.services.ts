@@ -38,3 +38,25 @@ export async function getDynamicThroughputData(
     ]
   };
 }
+
+export async function getDynamicLatencyData(
+  testData: number,
+) {
+  // Fake delay
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+
+  return {
+    received: [
+      // { x: -9, y: 20 + testData },
+      // { x: -8, y: 35 + testData },
+      // { x: -7, y: 45 + testData },
+      // { x: -6, y: 35 + testData },
+      { x: "-5", y: 15 + testData },
+      { x: "-4", y: 25 + testData },
+      { x: "-3", y: 30 + testData },
+      { x: "-2", y: 45 + testData },
+      { x: "-1", y: 55 + testData },
+      { x: "0", y: 65 + testData },
+    ]
+  };
+}

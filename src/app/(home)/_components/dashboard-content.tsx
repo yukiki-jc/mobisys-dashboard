@@ -4,9 +4,9 @@ import { PaymentsOverview } from "@/components/Charts/payments-overview";
 import { SettingsContainer } from "./settings-container";
 import { useEffect, useState } from "react";
 import { Toaster } from "react-hot-toast";
-import { fetchAvgThroughputAndLatency, getDynamicThroughputData } from "@/services/inference.services";
+import { fetchAvgThroughputAndLatency, getDynamicLatencyData, getDynamicThroughputData } from "@/services/inference.services";
 import type { ChartData } from "@/types/charts";
-import { getDeafultDynamicThroughputData } from "@/services/charts.services";
+import { getDeafultDynamicThroughputData, getDeafultHistoryData } from "@/services/charts.services";
 import { SplitResultTable } from "./split-result-table";
 import { exampleTraceRecord } from "./trace-reader";
 
@@ -106,20 +106,27 @@ export function DashboardContent({ timeFrame }: PropsType) {
     );
   }, [baseHistory]);
 
-  const fetchFakeData = async (k: number, isRunning: boolean) => {
+  const fetchFakeData = async (isRunning: boolean, k: number) => {
+    
     if (isRunning) {
+      // 假设延迟数据与吞吐量数据相关
       const newData = await getDynamicThroughputData(k);
+      const newLatencyData = await getDynamicLatencyData(k); 
+      const baseData = await getDynamicThroughputData(k - 10);
+      const baseLatencyData = await getDynamicLatencyData(k - 10);
+
       setThroughputData(newData);
-      setLatencyData(newData);
-      setBaseThroughputData(newData);
-      setBaseLatencyData(newData);
+      setLatencyData(newLatencyData);
+      setBaseThroughputData(baseData);
+      setBaseLatencyData(baseLatencyData);
     }
     else {
       const newData = getDeafultDynamicThroughputData(k);
+      const newLatencyData = getDeafultDynamicThroughputData(k);
       setThroughputData(newData);
-      setLatencyData(newData);
+      setLatencyData(newLatencyData);
       setBaseThroughputData(newData);
-      setBaseLatencyData(newData);
+      setBaseLatencyData(newLatencyData);
       setHistory([])
       setBaseHistory([])
     }
@@ -130,7 +137,7 @@ export function DashboardContent({ timeFrame }: PropsType) {
     // fetchData(counter, isRunning ?? false);
     if (!isRunning) {
       setCounter(0);
-      fetchFakeData(0, false);
+      fetchFakeData(false, 0);
       setHistory([])
       setBaseHistory([])
       return;
@@ -140,7 +147,7 @@ export function DashboardContent({ timeFrame }: PropsType) {
     const interval = setInterval(() => {
       setCounter(prev => {
         if (!isRunning) {
-          fetchFakeData(prev, false);
+          fetchFakeData(false, 0);
           setHistory([])
           setBaseHistory([])
           return 0;
@@ -148,7 +155,7 @@ export function DashboardContent({ timeFrame }: PropsType) {
         if (prev >= 29) {
           // downloadTraceRecord('trace-record.json');
           setIsRunning(false);
-          fetchFakeData(0, false);
+          fetchFakeData(false, 0);
           setBaseHistory([])
           setHistory([])
           clearInterval(interval);
@@ -156,6 +163,7 @@ export function DashboardContent({ timeFrame }: PropsType) {
           return 0;
         }
         fetchData(isRunning, prev);
+        // fetchFakeData(isRunning, prev);
         return prev + 1;
       });
     }, 2000);
