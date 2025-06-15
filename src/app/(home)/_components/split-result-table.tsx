@@ -36,8 +36,8 @@ export function SplitResultTable({ className, splitResult }: PropsType) {
               {splitResult.map((item, idx) => (
                 <TableCell key={"name-" + idx} className="text-center font-bold text-lg">{item.name}</TableCell>
               ))}
-            <TableCell className="text-center font-bold  text-lg">Total Blocks</TableCell>
-            <TableCell className="text-center font-bold border-l border-gray-300 dark:border-dark-3  text-lg">Cloud-only Blocks</TableCell>
+            <TableCell className="text-center font-bold  text-lg">Layers on Server</TableCell>
+            <TableCell className="text-center font-bold border-l border-gray-300 dark:border-dark-3  text-lg">Baseline: Cloud-only Serving w/o Split</TableCell>
             </TableRow>
             <TableRow>
               <TableCell className="text-center font-bold">Split Index</TableCell>
@@ -45,7 +45,7 @@ export function SplitResultTable({ className, splitResult }: PropsType) {
                 <TableCell key={"idx-" + idx} className="text-center  text-lg">{item.idx}</TableCell>
               ))}
             <TableCell className="text-center font-bold  text-lg">{totalBlocks} ({Math.round(((48 - totalBlocks) / 48) * 100)}%↓) </TableCell>
-            <TableCell className="text-center font-bold border-l border-gray-300 dark:border-dark-3  text-lg">48 (12 blocks × 4 devs)</TableCell>
+            <TableCell className="text-center font-bold border-l border-gray-300 dark:border-dark-3  text-lg">48 (12 layers × 4 devs)</TableCell>
             </TableRow>
           </TableBody>
         </Table>

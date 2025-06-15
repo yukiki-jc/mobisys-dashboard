@@ -60,3 +60,20 @@ export async function getDynamicLatencyData(
     ]
   };
 }
+
+export async function getDynamicCombinedData(
+  testData: number,
+) {
+  // Fake delay
+  // await new Promise((resolve) => setTimeout(resolve, 1000));
+  const newData = await getDynamicThroughputData(testData);
+  const newLatencyData = await getDynamicLatencyData(testData); 
+  const baseData = await getDynamicThroughputData(testData - 10);
+  const baseLatencyData = await getDynamicLatencyData(testData - 10);
+  return {
+    throughput: newData,
+    latency: newLatencyData,
+    baseThroughput: baseData,
+    baseLatency: baseLatencyData
+  };
+}

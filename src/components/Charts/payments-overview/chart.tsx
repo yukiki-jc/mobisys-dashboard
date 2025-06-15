@@ -1,14 +1,12 @@
 "use client";
 
 import { useIsMobile } from "@/hooks/use-mobile";
+import { ShownChartData } from "@/types/charts";
 import type { ApexOptions } from "apexcharts";
 import dynamic from "next/dynamic";
 
 type PropsType = {
-  data: {
-    received: { x: unknown; y: number }[];
-    baseline?: { x: unknown; y: number }[];
-  },
+  data: ShownChartData,
   ylimit: number;
 };
 
@@ -91,7 +89,7 @@ export function PaymentsOverviewChart({ data, ylimit }: PropsType) {
       axisTicks: {
         show: true,
       },
-      tickAmount: data.received.length,
+      tickAmount: data.real.length,
       tickPlacement: 'on',
       labels: {
         rotate: 0,
@@ -101,7 +99,7 @@ export function PaymentsOverviewChart({ data, ylimit }: PropsType) {
   };
   
   // Convert data.received.y to integer
-  const receivedInt = data.received.map(item => ({
+  const receivedInt = data.real.map(item => ({
     ...item,
     y: parseInt(item.y as any, 10)
   }));
@@ -116,7 +114,7 @@ export function PaymentsOverviewChart({ data, ylimit }: PropsType) {
   } else {
     tempData = receivedInt.map((item) => ({
       x: item.x,
-      y: item.y ? item.y - 2 : 0,
+      y: item.y - 10,
     }));
   }
   return (

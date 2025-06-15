@@ -114,6 +114,18 @@ export function getDeafultDynamicThroughputData(
   };
 }
 
+export function getDeafultCombinedData(
+  testData: number,
+) {
+  // CREATE A ALL ZERO DEFAULT DAT 
+  return {
+      throughput: getDeafultDynamicThroughputData(0),
+      latency: getDeafultDynamicThroughputData(0),
+      baseThroughput: getDeafultDynamicThroughputData(0),
+      baseLatency: getDeafultDynamicThroughputData(0)
+    };
+}
+
 export function getDeafultHistoryData(
   testData: number,
 ) {

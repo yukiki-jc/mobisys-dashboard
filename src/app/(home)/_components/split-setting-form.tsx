@@ -103,7 +103,7 @@ export function SplitSettingForm({ className, onSettingsChange, isRunning, isSta
             label="Bandwidth (MB/s)"
             placeholder="3"
             defaultValue="3"
-            min="0.5"
+            min="1"
             max="3"
             step="0.5"
             icon={<BandwidthIcon />}
@@ -132,7 +132,7 @@ export function SplitSettingForm({ className, onSettingsChange, isRunning, isSta
             className="w-1/3"
             type="number"
             name="latency"
-            label="Latency Deadline (compared to dev-only)"
+            label="Latency Deadline (k × on-device inference time)"
             placeholder="0.9"
             defaultValue="0.9"
             min="0.6"
