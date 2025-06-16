@@ -65,14 +65,16 @@ export function Sidebar() {
       >
         <div className="flex h-full flex-col py-10 pl-[25px] pr-[7px]">
           <div className="relative pr-4.5">
-            <Link
+            {/* <Link
               href={"/"}
               onClick={() => isMobile && toggleSidebar()}
               className="px-0 py-2.5 min-[850px]:py-0"
             >
               <Logo />
-            </Link>
-
+            </Link> */}
+            <div className="text-4xl font-extrabold text-blue select-none py-4 px-2">
+              CollabTrans Admin
+            </div>
             {isMobile && (
               <button
                 onClick={toggleSidebar}

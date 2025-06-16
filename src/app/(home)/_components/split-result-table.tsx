@@ -24,7 +24,7 @@ export function SplitResultTable({ className, splitResult }: PropsType) {
   return (
     <div className={cn("rounded-[10px] bg-white px-7.5 pb-4 pt-7.5 shadow-1 dark:bg-gray-dark dark:shadow-card", className)}>
       <h2 className="text-body-2xlg text-base font-bold text-dark dark:text-white">
-        Split Result
+        Split Result (Model: vit-base-p16-224)
       </h2>
       {(!splitResult || splitResult.length === 0) ? (
         <div>{placeHolder}</div>
