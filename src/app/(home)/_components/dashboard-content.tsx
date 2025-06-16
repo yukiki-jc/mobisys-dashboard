@@ -242,7 +242,7 @@ export function DashboardContent({ timeFrame }: PropsType) {
         className="col-span-12 xl:col-span-6"
         data={{ real: combinedData.latency.received, baseline: combinedData.baseLatency.received }}
         counter={counter}
-        dataName="Average Latency"
+        dataName="Average Serving Latency"
       />
     </div>
   );
