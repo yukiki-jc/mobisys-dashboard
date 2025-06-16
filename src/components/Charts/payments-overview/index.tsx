@@ -56,8 +56,11 @@ export function PaymentsOverview({
       )}
     >
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h2 className="text-body-2xlg font-bold text-dark dark:text-white">
-          Time {counter * 2}s, {dataName}: 
+        <h2 className="w-full text-body-2xlg font-bold text-dark dark:text-white">
+          Time {counter * 2}s
+        </h2>
+        <h2 className="w-full text-body-2xlg font-bold text-dark dark:text-white">
+          {dataName}: {standardFormat(data.real.length > 0 ? data.real[data.real.length - 1].y : 0)} {unitDict[dataName as keyof typeof unitDict]}, {standardFormat(better * 100)}% {betterStr} 
         </h2>
 
         {/* <PeriodPicker defaultValue={timeFrame} sectionKey="payments_overview" /> */}
@@ -65,21 +68,14 @@ export function PaymentsOverview({
 
       <PaymentsOverviewChart data={data} ylimit={ylimit} />
 
-      <dl className="grid divide-stroke text-center dark:divide-dark-3 sm:grid-cols-1 sm:divide-x [&>div]:flex [&>div]:flex-col-reverse [&>div]:gap-1">
+      {/* <dl className="grid divide-stroke text-center dark:divide-dark-3 sm:grid-cols-1 sm:divide-x [&>div]:flex [&>div]:flex-col-reverse [&>div]:gap-1">
         <div className="dark:border-dark-3 max-sm:mb-3 max-sm:border-b max-sm:pb-3 flex justify-center items-center">
           <dt className="text-xl font-bold text-dark dark:text-white">
             {standardFormat(data.real.length > 0 ? data.real[data.real.length - 1].y : 0)} {unitDict[dataName as keyof typeof unitDict]}, {standardFormat(better * 100)}% {betterStr} 
           </dt>
           <dd className="font-medium dark:text-dark-6">{dataName}</dd>
         </div>
-
-        {/* <div>
-          <dt className="text-xl font-bold text-dark dark:text-white">
-            ${standardFormat(data.due.reduce((acc: number, { y }: DataPoint) => acc + y, 0))}
-          </dt>
-          <dd className="font-medium dark:text-dark-6">Due Amount</dd>
-        </div> */}
-      </dl>
+      </dl> */}
     </div>
   );
 }
