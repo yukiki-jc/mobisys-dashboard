@@ -26,7 +26,7 @@ export function PaymentsOverview({
   
   const unitDict = {
     "Average Throughput": "Request/s",
-    "Average Latency": "ms"
+    "Average Serving Latency": "ms"
   }
   var ylimit = 0;
   var realData = data.real.length > 0 ? data.real[data.real.length - 1].y : 0
@@ -57,7 +57,7 @@ export function PaymentsOverview({
     >
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h2 className="text-body-2xlg font-bold text-dark dark:text-white">
-          {dataName}: Current Time = {counter * 2}s (0 at the x-axis)
+          {dataName}: 
         </h2>
 
         {/* <PeriodPicker defaultValue={timeFrame} sectionKey="payments_overview" /> */}
@@ -70,7 +70,7 @@ export function PaymentsOverview({
           <dt className="text-xl font-bold text-dark dark:text-white">
             {standardFormat(data.real.length > 0 ? data.real[data.real.length - 1].y : 0)} {unitDict[dataName as keyof typeof unitDict]}, {standardFormat(better * 100)}% {betterStr} 
           </dt>
-          <dd className="font-medium dark:text-dark-6">{dataName}</dd>
+          <dd className="font-medium dark:text-dark-6">Current Time {counter * 2}s {dataName}</dd>
         </div>
 
         {/* <div>

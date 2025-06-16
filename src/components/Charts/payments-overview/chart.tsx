@@ -23,6 +23,7 @@ export function PaymentsOverviewChart({ data, ylimit }: PropsType) {
       position: "top",
       horizontalAlign: "left",
       fontFamily: "Satoshi",
+      fontSize: "18px",
     },
     colors: ["#5750F1", "#0ABEF9"],
     chart: {
@@ -123,7 +124,7 @@ export function PaymentsOverviewChart({ data, ylimit }: PropsType) {
         options={options}
         series={[
           {
-            name: "Received",
+            name: "CollabTrans",
             data: receivedInt,
           },
           {
