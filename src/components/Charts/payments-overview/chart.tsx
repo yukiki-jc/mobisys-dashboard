@@ -124,11 +124,11 @@ export function PaymentsOverviewChart({ data, ylimit }: PropsType) {
         options={options}
         series={[
           {
-            name: "CollabTrans",
+            name: "CollabTrans Throughput",
             data: receivedInt,
           },
           {
-            name: "Baseline",
+            name: "Baseline Throughput",
             data: tempData,
           }
         ]}

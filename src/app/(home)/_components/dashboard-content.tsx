@@ -18,6 +18,7 @@ type PropsType = {
 };
 import { appendTraceRecord, downloadTraceRecord } from "./trace-recorder";
 import { clear } from "console";
+import { ClientOverview } from "@/components/Charts/client-overview";
 
 type CombinedData = {
   throughput: ChartData;
@@ -234,16 +235,22 @@ export function DashboardContent({ timeFrame }: PropsType) {
       </div>
       <PaymentsOverview
         className="col-span-12 xl:col-span-6"
-        data={{ real: combinedData.throughput.received, baseline: combinedData.baseThroughput.received }}
+        data={{ real: combinedData.throughput.received, baseline: combinedData.baseThroughput.received, realLatency: combinedData.latency.received, baselineLatency: combinedData.baseLatency.received }}
         counter={counter}
         dataName="Average Throughput"
       />
-      <PaymentsOverview
+      <ClientOverview
         className="col-span-12 xl:col-span-6"
         data={{ real: combinedData.latency.received, baseline: combinedData.baseLatency.received }}
         counter={counter}
         dataName="Average Serving Latency"
       />
+      {/* <PaymentsOverview
+        className="col-span-12 xl:col-span-6"
+        data={{ real: combinedData.latency.received, baseline: combinedData.baseLatency.received }}
+        counter={counter}
+        dataName="Average Serving Latency"
+      /> */}
     </div>
   );
 } 

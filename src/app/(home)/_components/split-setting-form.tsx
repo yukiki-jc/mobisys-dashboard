@@ -25,7 +25,7 @@ const SCENARIOS = [
     label: "A",
     bandwidth: 3,
     accuracy: 0.1,
-    latency: 0.9,
+    latency: 0.81,
     bandwidthDesc: "High",
     accuracyDesc: "High",
     deadlineDesc: "Loose",
@@ -35,7 +35,7 @@ const SCENARIOS = [
     label: "B",
     bandwidth: 3,
     accuracy: 0.04,
-    latency: 0.9,
+    latency: 0.81,
     bandwidthDesc: "High",
     accuracyDesc: "Low",
     deadlineDesc: "Loose",
@@ -43,21 +43,21 @@ const SCENARIOS = [
   {
     key: "C",
     label: "C",
-    bandwidth: 3,
+    bandwidth: 1,
     accuracy: 0.1,
-    latency: 0.7,
-    bandwidthDesc: "High",
+    latency: 0.81,
+    bandwidthDesc: "Low",
     accuracyDesc: "High",
-    deadlineDesc: "Medium",
+    deadlineDesc: "Loose",
   },
   {
     key: "D",
     label: "D",
-    bandwidth: 1,
+    bandwidth: 3,
     accuracy: 0.1,
-    latency: 0.6,
-    bandwidthDesc: "Low",
-    accuracyDesc: "Low",
+    latency: 0.63,
+    bandwidthDesc: "High",
+    accuracyDesc: "High",
     deadlineDesc: "Tight",
   },
 ];
@@ -135,7 +135,7 @@ export function SplitSettingForm({ className, onSettingsChange, isRunning, isSta
 
   const [selected, setSelected] = useState("A");
 
-  useEffect(() => {
+  const handleApply = () => {
     const scenario = SCENARIOS.find(s => s.key === selected);
     if (scenario) {
       onSettingsChange({
@@ -145,8 +145,7 @@ export function SplitSettingForm({ className, onSettingsChange, isRunning, isSta
       });
       setIsStartEnabled(true);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selected]);
+  };
   const scenario = SCENARIOS.find(s => s.key === selected);
   const handleScenarioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSelected(e.target.value);
@@ -243,6 +242,19 @@ export function SplitSettingForm({ className, onSettingsChange, isRunning, isSta
   </div>
         </div>
         <div className="flex justify-center gap-3 mb-7.5">
+          <button
+            className={cn(
+              "rounded-lg px-6 py-[7px] font-medium text-gray-2",
+              !isRunning
+                ? "bg-blue-500 hover:bg-opacity-90"
+                : "bg-gray-400 cursor-not-allowed"
+            )}
+            type="button"
+            onClick={handleApply}
+            disabled={isRunning}
+          >
+            Apply
+          </button>
           <button
             className={cn(
               "rounded-lg px-6 py-[7px] font-medium text-gray-2",
