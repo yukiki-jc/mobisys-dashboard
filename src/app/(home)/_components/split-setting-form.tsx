@@ -10,7 +10,59 @@ import InputGroup from "@/components/FormElements/InputGroup";
 import { TextAreaGroup } from "@/components/FormElements/InputGroup/text-area";
 import { ShowcaseSection } from "@/components/Layouts/showcase-section";
 import { cn } from "@/lib/utils";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+const SCENARIOS = [
+  {
+    key: "A",
+    label: "A",
+    bandwidth: 3,
+    accuracy: 0.1,
+    latency: 0.9,
+    bandwidthDesc: "High",
+    accuracyDesc: "High",
+    deadlineDesc: "Loose",
+  },
+  {
+    key: "B",
+    label: "B",
+    bandwidth: 3,
+    accuracy: 0.04,
+    latency: 0.9,
+    bandwidthDesc: "High",
+    accuracyDesc: "Low",
+    deadlineDesc: "Loose",
+  },
+  {
+    key: "C",
+    label: "C",
+    bandwidth: 3,
+    accuracy: 0.1,
+    latency: 0.7,
+    bandwidthDesc: "High",
+    accuracyDesc: "High",
+    deadlineDesc: "Medium",
+  },
+  {
+    key: "D",
+    label: "D",
+    bandwidth: 1,
+    accuracy: 0.1,
+    latency: 0.6,
+    bandwidthDesc: "Low",
+    accuracyDesc: "Low",
+    deadlineDesc: "Tight",
+  },
+];
+
+
 
 function BandwidthIcon() {
   return (
@@ -81,6 +133,24 @@ export function SplitSettingForm({ className, onSettingsChange, isRunning, isSta
     }
   };
 
+  const [selected, setSelected] = useState("A");
+
+  useEffect(() => {
+    const scenario = SCENARIOS.find(s => s.key === selected);
+    if (scenario) {
+      onSettingsChange({
+        bandwidth: scenario.bandwidth,
+        accuracy: scenario.accuracy,
+        latency: scenario.latency,
+      });
+      setIsStartEnabled(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selected]);
+  const scenario = SCENARIOS.find(s => s.key === selected);
+  const handleScenarioChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSelected(e.target.value);
+  };
   return (
       <div
         className={cn(
@@ -94,82 +164,90 @@ export function SplitSettingForm({ className, onSettingsChange, isRunning, isSta
           </h2>
 
         </div>
-      <form onSubmit={handleSubmit}>
-        <div className="mb-5.5 flex flex-row gap-5.5">
-          <InputGroup
-            className="w-1/3"
-            type="number"
-            name="bandwidth"
-            label="Bandwidth (MB/s)"
-            placeholder="3"
-            defaultValue="3"
-            min="1"
-            max="3"
-            step="0.5"
-            icon={<BandwidthIcon />}
-            iconPosition="left"
-            height="sm"
-            handleChange={handleAnyInputChange}
-          />
-
-          <InputGroup
-            className="w-1/3"
-            type="number"
-            name="accuracy"
-            label="Accuracy Loss Limit"
-            placeholder="0.04"
-            defaultValue="0.04"
-            min="0.02"
-            max="0.1"
-            step="0.02"
-            icon={<AccuracyIcon />}
-            iconPosition="left"
-            height="sm"
-            handleChange={handleAnyInputChange}
-          />
-          
-          <InputGroup
-            className="w-1/3"
-            type="number"
-            name="latency"
-            label="Latency Deadline (k × on-device inference time)"
-            placeholder="0.9"
-            defaultValue="0.9"
-            min="0.6"
-            max="0.9"
-            step="0.1"
-            icon={<LatencyIcon />}
-            iconPosition="left"
-            height="sm"
-            handleChange={handleAnyInputChange}
-          />
+      <form>
+        <div className="mb-5.5 overflow-x-auto">
+  <Table>
+    <TableBody>
+      <TableRow className="bg-gray-100">
+        <TableCell className="text-center font-bold text-lg">Select</TableCell>
+        <TableCell className="text-center font-bold text-lg">Scenario</TableCell>
+        <TableCell className="text-center font-bold text-lg">Bandwidth</TableCell>
+        <TableCell className="text-center font-bold text-lg">Accuracy Loss</TableCell>
+        <TableCell className="text-center font-bold text-lg">Deadline</TableCell>
+      </TableRow>
+      {SCENARIOS.map(s => (
+        <TableRow key={s.key}>
+          <TableCell className="text-center">
+            <input
+              type="radio"
+              name="scenario"
+              value={s.key}
+              checked={selected === s.key}
+              onChange={handleScenarioChange}
+              disabled={isRunning}
+            />
+          </TableCell>
+          <TableCell className="text-center font-bold text-lg">{s.label}</TableCell>
+          <TableCell className="text-center font-bold text-base">{s.bandwidthDesc}</TableCell>
+          <TableCell className="text-center font-bold text-base">{s.accuracyDesc}</TableCell>
+          <TableCell className="text-center font-bold text-base">{s.deadlineDesc}</TableCell>
+        </TableRow>
+      ))}
+    </TableBody>
+  </Table>
+</div>
+        <div className="mb-5.5">
+          <div className="mb-5.5 grid grid-cols-1 sm:grid-cols-3 gap-4">
+  <div>
+    <label className="block text-sm font-medium mb-1 flex items-center gap-1" htmlFor="bandwidth">
+      <BandwidthIcon />
+      Bandwidth (MB/s)
+    </label>
+    <input
+      id="bandwidth"
+      type="number"
+      className="w-full rounded border px-3 py-2 bg-gray-100 text-gray-700"
+      value={scenario?.bandwidth ?? ""}
+      disabled
+      readOnly
+    />
+  </div>
+  <div>
+    <label className="block text-sm font-medium mb-1 flex items-center gap-1" htmlFor="accuracy">
+      <AccuracyIcon />
+      Accuracy Loss Limit
+    </label>
+    <input
+      id="accuracy"
+      type="number"
+      className="w-full rounded border px-3 py-2 bg-gray-100 text-gray-700"
+      value={scenario?.accuracy ?? ""}
+      disabled
+      readOnly
+    />
+  </div>
+  <div>
+    <label className="block text-sm font-medium mb-1 flex items-center gap-1" htmlFor="latency">
+      <LatencyIcon />
+      Latency Deadline (s)
+    </label>
+    <input
+        id="latency"
+        type="number"
+        className="w-full rounded border px-3 py-2 bg-gray-100 text-gray-700"
+        value={scenario?.latency ?? ""}
+        disabled
+        readOnly
+    />
+    </div>
+  </div>
         </div>
-
         <div className="flex justify-center gap-3 mb-7.5">
-          {/* <button
-            className="rounded-lg border border-stroke px-6 py-[7px] font-medium text-dark hover:shadow-1 dark:border-dark-3 dark:text-white"
-            type="button"
-          >
-            Cancel
-          </button> */}
-
-          <button
-            className={cn(
-              "rounded-lg px-6 py-[7px] font-medium text-gray-2",
-              !isRunning
-                ? "bg-primary hover:bg-opacity-90"
-                : "bg-gray-400 cursor-not-allowed"
-            )}
-            type="submit"
-            disabled={isRunning}
-          >
-            Apply
-          </button>
           <button
             className={cn(
               "rounded-lg px-6 py-[7px] font-medium text-gray-2",
               isStartEnabled && !isRunning
-                ? "bg-green-500 hover:bg-opacity-90" 
+                ? "bg-green-500 hover:bg-opacity-90"
                 : "bg-gray-400 cursor-not-allowed"
             )}
             type="button"
@@ -182,7 +260,7 @@ export function SplitSettingForm({ className, onSettingsChange, isRunning, isSta
             className={cn(
               "rounded-lg px-6 py-[7px] font-medium text-gray-2",
               isRunning
-                ? "bg-red-500 hover:bg-opacity-90" 
+                ? "bg-red-500 hover:bg-opacity-90"
                 : "bg-gray-400 cursor-not-allowed"
             )}
             type="button"
